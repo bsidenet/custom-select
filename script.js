@@ -1,12 +1,11 @@
 /**
- * @description Controlador JavaScript para o componente Custom Select com suporte para rato e teclado
- * @version 1.0.0
+ * @description Controlador JavaScript do Custom Select com Filtro de Pesquisa e suporte teclado
+ * @version 1.1.0
  * @author Bsidenet.com
  * @date 2026-10-29
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleciona todos os componentes custom-select existentes na página
     const customSelects = document.querySelectorAll('.custom-select');
 
     customSelects.forEach((selectContainer) => {
@@ -15,7 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const triggerRole = trigger.querySelector('.item-role');
         const optionsList = selectContainer.querySelector('.custom-select-options');
         const options = Array.from(selectContainer.querySelectorAll('.custom-option'));
+        const emptyState = selectContainer.querySelector('.custom-option-empty');
         const hiddenInput = selectContainer.querySelector('input[type="hidden"]');
+        const searchInput = selectContainer.querySelector('.custom-select-search-input');
         const debugOutput = document.getElementById('debug-valor');
 
         let focusedIndex = options.findIndex(opt => opt.classList.contains('is-selected'));
@@ -25,41 +26,83 @@ document.addEventListener('DOMContentLoaded', () => {
          */
         const toggleDropdown = () => {
             const isOpen = selectContainer.classList.contains('is-open');
-            closeAllSelects(); // Fecha outros selects abertos na página, se existirem
+            closeAllSelects();
 
             if (!isOpen) {
                 selectContainer.classList.add('is-open');
                 trigger.setAttribute('aria-expanded', 'true');
-                optionsList.focus();
+                
+                // Reseta a pesquisa e foca o campo de pesquisa automaticamente
+                if (searchInput) {
+                    searchInput.value = '';
+                    filterOptions('');
+                    // Foca a caixa de pesquisa ao abrir para ser imediato escrever
+                    setTimeout(() => searchInput.focus(), 50);
+                } else {
+                    optionsList.focus();
+                }
             }
         };
 
         /**
-         * Seleciona uma opção específica e atualiza o botão e o input hidden
-         * @param {HTMLElement} optionElement - O elemento <li> clicado ou escolhido
+         * Lógica de Filtro de Pesquisa (Nova Funcionalidade)
+         */
+        const filterOptions = (term) => {
+            const normalizedTerm = term.toLowerCase().trim();
+            let hasVisibleOptions = false;
+
+            options.forEach(option => {
+                const name = option.querySelector('.item-name').textContent.toLowerCase();
+                const role = option.querySelector('.item-role').textContent.toLowerCase();
+                
+                // Pesquisa no nome OU no cargo
+                if (name.includes(normalizedTerm) || role.includes(normalizedTerm)) {
+                    option.style.display = 'flex';
+                    hasVisibleOptions = true;
+                } else {
+                    option.style.display = 'none';
+                    option.classList.remove('is-focused');
+                }
+            });
+
+            // Mostra a mensagem de erro se não houver resultados
+            if (emptyState) {
+                emptyState.style.display = hasVisibleOptions ? 'none' : 'block';
+            }
+        };
+
+        // Evento de digitação na caixa de pesquisa
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                filterOptions(e.target.value);
+                // Reseta o foco do teclado para a primeira opção visível após pesquisar
+                focusedIndex = -1; 
+            });
+
+            // Impede que clicar no campo de pesquisa feche o dropdown
+            searchInput.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        /**
+         * Seleciona uma opção e atualiza o estado
          */
         const selectOption = (optionElement) => {
             const value = optionElement.getAttribute('data-value');
             const nameText = optionElement.querySelector('.item-name').textContent;
             const roleText = optionElement.querySelector('.item-role').textContent;
 
-            // 1. Atualiza o texto visível no botão principal
             triggerName.textContent = nameText;
             triggerRole.textContent = roleText;
 
-            // 2. Atualiza o valor do input hidden (para submissão PHP/Form)
             if (hiddenInput) {
                 hiddenInput.value = value;
-                // Dispara evento 'change' caso tenhas outros scripts à escuta
                 hiddenInput.dispatchEvent(new Event('change'));
             }
 
-            // 3. Atualiza o indicador visual de demonstração
             if (debugOutput) {
                 debugOutput.textContent = value + ` (${nameText})`;
             }
 
-            // 4. Atualiza as classes e atributos de acessibilidade nas opções
             options.forEach(opt => {
                 opt.classList.remove('is-selected', 'is-focused');
                 opt.setAttribute('aria-selected', 'false');
@@ -67,21 +110,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             optionElement.classList.add('is-selected');
             optionElement.setAttribute('aria-selected', 'true');
-            focusedIndex = options.indexOf(optionElement);
+            
+            // Atualiza o índice focado considerando apenas os visíveis
+            focusedIndex = getVisibleOptions().indexOf(optionElement);
 
-            // 5. Fecha o dropdown e devolve o foco ao botão
             selectContainer.classList.remove('is-open');
             trigger.setAttribute('aria-expanded', 'false');
             trigger.focus();
         };
 
-        // Evento de clique no botão principal
         trigger.addEventListener('click', (event) => {
             event.stopPropagation();
             toggleDropdown();
         });
 
-        // Evento de clique em cada opção da lista
         options.forEach((option) => {
             option.addEventListener('click', (event) => {
                 event.stopPropagation();
@@ -89,9 +131,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Suporte para navegação por teclado (Setas Cima/Baixo, Enter e Escape)
+        /**
+         * Utilitário para obter apenas as opções que não foram filtradas pela pesquisa
+         */
+        const getVisibleOptions = () => options.filter(opt => opt.style.display !== 'none');
+
+        // Navegação por teclado inteligente (considera pesquisa)
         selectContainer.addEventListener('keydown', (event) => {
             const isOpen = selectContainer.classList.contains('is-open');
+            const visibleOptions = getVisibleOptions();
 
             if (event.key === 'Escape') {
                 selectContainer.classList.remove('is-open');
@@ -104,42 +152,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.preventDefault();
                 if (!isOpen) {
                     toggleDropdown();
-                } else {
-                    focusedIndex = (focusedIndex + 1) % options.length;
-                    updateFocusedOption(options, focusedIndex);
+                } else if (visibleOptions.length > 0) {
+                    // Impede o foco de descer para a caixa de input, navega apenas nas <li>
+                    const currentVisibleIndex = visibleOptions.findIndex(opt => opt.classList.contains('is-focused'));
+                    const nextIndex = (currentVisibleIndex + 1) % visibleOptions.length;
+                    updateFocusedOption(visibleOptions, nextIndex);
                 }
             } else if (event.key === 'ArrowUp') {
                 event.preventDefault();
                 if (!isOpen) {
                     toggleDropdown();
-                } else {
-                    focusedIndex = (focusedIndex - 1 + options.length) % options.length;
-                    updateFocusedOption(options, focusedIndex);
+                } else if (visibleOptions.length > 0) {
+                    const currentVisibleIndex = visibleOptions.findIndex(opt => opt.classList.contains('is-focused'));
+                    const nextIndex = (currentVisibleIndex - 1 + visibleOptions.length) % visibleOptions.length;
+                    updateFocusedOption(visibleOptions, nextIndex);
                 }
-            } else if (event.key === 'Enter' || event.key === ' ') {
-                if (isOpen && focusedIndex >= 0) {
-                    event.preventDefault();
-                    selectOption(options[focusedIndex]);
+            } else if (event.key === 'Enter') {
+                if (isOpen) {
+                    event.preventDefault(); // Impede submissão de formulários ao pesquisar
+                    const currentFocused = visibleOptions.find(opt => opt.classList.contains('is-focused'));
+                    if (currentFocused) {
+                        selectOption(currentFocused);
+                    } else if (visibleOptions.length === 1) {
+                        // Se houver apenas 1 resultado após pesquisar, o Enter seleciona-o logo
+                        selectOption(visibleOptions[0]);
+                    }
                 }
             }
         });
     });
 
-    /**
-     * Auxiliar para destacar visualmente a opção ao navegar com as setas do teclado
-     */
-    function updateFocusedOption(options, index) {
-        options.forEach(opt => opt.classList.remove('is-focused'));
-        const target = options[index];
+    function updateFocusedOption(visibleOptions, index) {
+        // Limpa o focus de TODAS as opções primeiro
+        document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('is-focused'));
+        const target = visibleOptions[index];
         if (target) {
             target.classList.add('is-focused');
             target.scrollIntoView({ block: 'nearest' });
         }
     }
 
-    /**
-     * Fecha todos os selects personalizados quando se clica fora deles
-     */
     function closeAllSelects() {
         document.querySelectorAll('.custom-select.is-open').forEach((openSelect) => {
             openSelect.classList.remove('is-open');
@@ -148,6 +200,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fecha o menu se o utilizador clicar em qualquer zona fora do componente
     document.addEventListener('click', closeAllSelects);
 });
