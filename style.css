@@ -1,0 +1,333 @@
+/**
+ * @description Estilos CSS para Select Nativo Moderno (base-select) e Custom Select Universal
+ * @version 1.0.0
+ * @author Bsidenet.com
+ * @date 2026-10-29
+ */
+
+/* ==========================================================================
+   1. VARIÁVEIS E RESET BASE (Tema Claro, Limpo e Tipografia Fina)
+   ========================================================================== */
+:root {
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-hover: #f1f5f9;
+    --bg-selected: #eff6ff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --border-focus: #3b82f6;
+    --accent-color: #2563eb;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    --shadow-dropdown: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.5;
+    padding: 40px 20px;
+}
+
+/* ==========================================================================
+   2. LAYOUT DE DEMONSTRAÇÃO
+   ========================================================================== */
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.page-header {
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.page-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.grid-demo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: #f1f5f9;
+    color: #475569;
+    margin-bottom: 12px;
+}
+
+.badge-universal {
+    background: #eff6ff;
+    color: var(--accent-color);
+}
+
+.card h2 {
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.card-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* ==========================================================================
+   3. ABORDAGEM 1: SELECT NATIVO MODERNO (appearance: base-select)
+   ========================================================================== */
+.native-rich-select,
+.native-rich-select::picker(select) {
+    /* Ativa o novo modo de renderização de Select do CSS moderno */
+    appearance: base-select;
+}
+
+.native-rich-select {
+    width: 100%;
+    padding: 10px 14px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.native-rich-select:hover {
+    border-color: #cbd5e1;
+}
+
+.native-rich-select:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Estilo da caixa de listagem (Dropdown nativo) */
+.native-rich-select::picker(select) {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-dropdown);
+    padding: 6px;
+    margin-top: 6px;
+}
+
+/* Estilo de cada <option> no select nativo */
+.native-rich-select option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.native-rich-select option:hover {
+    background-color: var(--bg-hover);
+}
+
+.native-rich-select option:checked {
+    background-color: var(--bg-selected);
+}
+
+/* Estrutura do conteúdo selecionado dentro do botão nativo */
+.native-rich-select selectedcontent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+/* Tipografia diferenciada: Nome (Maior) vs Cargo (Menor) */
+.opt-name {
+    font-size: 0.95rem;   /* 15.2px */
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.opt-role {
+    font-size: 0.75rem;   /* 12px - Mais pequeno para o cargo */
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   4. ABORDAGEM 2: CUSTOM SELECT UNIVERSAL (HTML + CSS + JS)
+   ========================================================================== */
+.custom-select {
+    position: relative;
+    width: 100%;
+    user-select: none;
+}
+
+/* Botão principal que abre o dropdown */
+.custom-select-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-select-trigger:hover {
+    border-color: #cbd5e1;
+}
+
+.custom-select.is-open .custom-select-trigger,
+.custom-select-trigger:focus-visible {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.trigger-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.select-arrow {
+    color: var(--text-secondary);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+/* Roda a seta quando o menu está aberto */
+.custom-select.is-open .select-arrow {
+    transform: rotate(180deg);
+    color: var(--accent-color);
+}
+
+/* Lista suspensa de opções */
+.custom-select-options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-dropdown);
+    padding: 6px;
+    list-style: none;
+    z-index: 100;
+    max-height: 260px;
+    overflow-y: auto;
+    
+    /* Estado oculto por defeito */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+
+/* Estado visível quando a classe .is-open está ativa */
+.custom-select.is-open .custom-select-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Cada item da lista */
+.custom-option {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.custom-option:hover,
+.custom-option.is-focused {
+    background-color: var(--bg-hover);
+}
+
+.custom-option.is-selected {
+    background-color: var(--bg-selected);
+}
+
+/* Tamanhos de letra diferentes para Nome e Cargo */
+.item-name {
+    font-size: 0.95rem;   /* Tamanho maior para o Nome */
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.25;
+}
+
+.custom-option.is-selected .item-name {
+    color: var(--accent-color);
+}
+
+.item-role {
+    font-size: 0.75rem;   /* Tamanho reduzido para o Cargo */
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+/* Barra informativa de debug */
+.status-bar {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: #f8fafc;
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+}
