@@ -1,0 +1,132 @@
+<!--
+ * @description Estrutura HTML com duas abordagens de Select personalizado (Nome + Cargo com tamanhos diferentes)
+ * @version 1.0.0
+ * @author Bsidenet.com
+ * @date 2026-10-29
+-->
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Personalizado - Nome e Cargo</title>
+    <!-- Ligação para a folha de estilos externa -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="container">
+        <header class="page-header">
+            <h1>Personalização de Select (Nome + Cargo)</h1>
+            <p>Duas formas de aplicar tipografias e tamanhos diferentes dentro de cada opção.</p>
+        </header>
+
+        <div class="grid-demo">
+
+            <!-- =================================================================
+                 ABORDAGEM 1: SELECT NATIVO MODERNO (CSS appearance: base-select)
+                 Nota: Funciona nativamente no Chrome/Edge modernos sem JavaScript.
+                 ================================================================= -->
+            <section class="card">
+                <span class="badge">Abordagem 1 • CSS Nativo Moderno</span>
+                <h2>Select HTML Nativo Customizável</h2>
+                <p class="card-desc">Usa a propriedade <code>appearance: base-select</code>, permitindo colocar tags <code>&lt;span&gt;</code> dentro de <code>&lt;option&gt;</code>.</p>
+
+                <div class="form-group">
+                    <label for="colaborador-nativo" class="form-label">Selecionar Responsável</label>
+                    
+                    <select id="colaborador-nativo" name="colaborador_nativo" class="native-rich-select">
+                        <!-- O elemento <button> com <selectedcontent> reflete o HTML da opção escolhida -->
+                        <button>
+                            <selectedcontent></selectedcontent>
+                        </button>
+
+                        <option value="">
+                            <span class="opt-name">Selecione um colaborador...</span>
+                            <span class="opt-role">Lista de equipa interna</span>
+                        </option>
+                        <option value="1" selected>
+                            <span class="opt-name">Ricardo Lopes</span>
+                            <span class="opt-role">Engenharia IT &amp; Web Development</span>
+                        </option>
+                        <option value="2">
+                            <span class="opt-name">Luís Silva</span>
+                            <span class="opt-role">Administrador Executivo</span>
+                        </option>
+                        <option value="3">
+                            <span class="opt-name">Roberto Lopes</span>
+                            <span class="opt-role">Gestor de Propostas Comerciais</span>
+                        </option>
+                        <option value="4">
+                            <span class="opt-name">Paulo Costa</span>
+                            <span class="opt-role">Consultor Externo de Arquitetura &amp; ERP</span>
+                        </option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 ABORDAGEM 2: CUSTOM SELECT (HTML + CSS + JS) - 100% COMPATÍVEL
+                 Nota: Funciona em qualquer browser/SO com controlo visual total.
+                 ================================================================= -->
+            <section class="card">
+                <span class="badge badge-universal">Abordagem 2 • Universal (Cross-Browser)</span>
+                <h2>Custom Dropdown com Input Hidden</h2>
+                <p class="card-desc">Construído com elementos semânticos e JavaScript leve. Garante o mesmo aspeto em Chrome, Firefox, Safari e Mobile.</p>
+
+                <form id="form-exemplo" class="form-group">
+                    <label id="custom-select-label" class="form-label">Selecionar Responsável</label>
+
+                    <!-- Contentor principal do Custom Select -->
+                    <div class="custom-select" id="select-colaborador" data-name="colaborador_id">
+                        
+                        <!-- Input oculto que envia o valor real no POST/GET do formulário -->
+                        <input type="hidden" name="colaborador_id" id="colaborador_id_input" value="1">
+
+                        <!-- Botão principal ( mostra o item atualmente selecionado ) -->
+                        <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="custom-select-label">
+                            <div class="trigger-content">
+                                <span class="item-name">Ricardo Lopes</span>
+                                <span class="item-role">Engenharia IT &amp; Web Development</span>
+                            </div>
+                            <!-- Ícone da seta em SVG -->
+                            <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+
+                        <!-- Lista de opções (Dropdown) -->
+                        <ul class="custom-select-options" role="listbox" tabindex="-1">
+                            <li class="custom-option is-selected" role="option" aria-selected="true" data-value="1">
+                                <span class="item-name">Ricardo Lopes</span>
+                                <span class="item-role">Engenharia IT &amp; Web Development</span>
+                            </li>
+                            <li class="custom-option" role="option" aria-selected="false" data-value="2">
+                                <span class="item-name">Luís Silva</span>
+                                <span class="item-role">Administrador Executivo</span>
+                            </li>
+                            <li class="custom-option" role="option" aria-selected="false" data-value="3">
+                                <span class="item-name">Roberto Lopes</span>
+                                <span class="item-role">Gestor de Propostas Comerciais</span>
+                            </li>
+                            <li class="custom-option" role="option" aria-selected="false" data-value="4">
+                                <span class="item-name">Paulo Costa</span>
+                                <span class="item-role">Consultor Externo de Arquitetura &amp; ERP</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Demonstração do valor guardado para o backend -->
+                    <div class="status-bar">
+                        Valor no <code>&lt;input type="hidden"&gt;</code>: <strong id="debug-valor">1</strong>
+                    </div>
+                </form>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Ligação para o ficheiro JavaScript externo -->
+    <script src="script.js"></script>
+</body>
+</html>
