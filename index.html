@@ -1,6 +1,6 @@
 <!--
- * @description Estrutura HTML com duas abordagens de Select personalizado (Nome + Cargo com tamanhos diferentes)
- * @version 1.0.0
+ * @description Estrutura HTML com Select Nativo e Custom Select (agora com Pesquisa)
+ * @version 1.1.0
  * @author Bsidenet.com
  * @date 2026-10-29
 -->
@@ -18,25 +18,23 @@
     <main class="container">
         <header class="page-header">
             <h1>Personalização de Select (Nome + Cargo)</h1>
-            <p>Duas formas de aplicar tipografias e tamanhos diferentes dentro de cada opção.</p>
+            <p>Duas formas de aplicar tipografias diferentes, agora com pesquisa em tempo real no Custom Select.</p>
         </header>
 
         <div class="grid-demo">
 
             <!-- =================================================================
                  ABORDAGEM 1: SELECT NATIVO MODERNO (CSS appearance: base-select)
-                 Nota: Funciona nativamente no Chrome/Edge modernos sem JavaScript.
                  ================================================================= -->
             <section class="card">
                 <span class="badge">Abordagem 1 • CSS Nativo Moderno</span>
                 <h2>Select HTML Nativo Customizável</h2>
-                <p class="card-desc">Usa a propriedade <code>appearance: base-select</code>, permitindo colocar tags <code>&lt;span&gt;</code> dentro de <code>&lt;option&gt;</code>.</p>
+                <p class="card-desc">Usa a propriedade <code>appearance: base-select</code>. Limpo, mas sem barra de pesquisa nativa (ainda).</p>
 
                 <div class="form-group">
                     <label for="colaborador-nativo" class="form-label">Selecionar Responsável</label>
                     
                     <select id="colaborador-nativo" name="colaborador_nativo" class="native-rich-select">
-                        <!-- O elemento <button> com <selectedcontent> reflete o HTML da opção escolhida -->
                         <button>
                             <selectedcontent></selectedcontent>
                         </button>
@@ -66,13 +64,12 @@
             </section>
 
             <!-- =================================================================
-                 ABORDAGEM 2: CUSTOM SELECT (HTML + CSS + JS) - 100% COMPATÍVEL
-                 Nota: Funciona em qualquer browser/SO com controlo visual total.
+                 ABORDAGEM 2: CUSTOM SELECT COM PESQUISA (HTML + CSS + JS)
                  ================================================================= -->
             <section class="card">
                 <span class="badge badge-universal">Abordagem 2 • Universal (Cross-Browser)</span>
-                <h2>Custom Dropdown com Input Hidden</h2>
-                <p class="card-desc">Construído com elementos semânticos e JavaScript leve. Garante o mesmo aspeto em Chrome, Firefox, Safari e Mobile.</p>
+                <h2>Custom Dropdown com Pesquisa</h2>
+                <p class="card-desc">Garante o mesmo aspeto em todos os browsers e adiciona uma caixa de filtro rápido no topo do menu.</p>
 
                 <form id="form-exemplo" class="form-group">
                     <label id="custom-select-label" class="form-label">Selecionar Responsável</label>
@@ -80,43 +77,58 @@
                     <!-- Contentor principal do Custom Select -->
                     <div class="custom-select" id="select-colaborador" data-name="colaborador_id">
                         
-                        <!-- Input oculto que envia o valor real no POST/GET do formulário -->
+                        <!-- Input oculto para o backend (PHP) -->
                         <input type="hidden" name="colaborador_id" id="colaborador_id_input" value="1">
 
-                        <!-- Botão principal ( mostra o item atualmente selecionado ) -->
+                        <!-- Botão principal -->
                         <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="custom-select-label">
                             <div class="trigger-content">
                                 <span class="item-name">Ricardo Lopes</span>
                                 <span class="item-role">Engenharia IT &amp; Web Development</span>
                             </div>
-                            <!-- Ícone da seta em SVG -->
                             <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
 
-                        <!-- Lista de opções (Dropdown) -->
-                        <ul class="custom-select-options" role="listbox" tabindex="-1">
-                            <li class="custom-option is-selected" role="option" aria-selected="true" data-value="1">
-                                <span class="item-name">Ricardo Lopes</span>
-                                <span class="item-role">Engenharia IT &amp; Web Development</span>
-                            </li>
-                            <li class="custom-option" role="option" aria-selected="false" data-value="2">
-                                <span class="item-name">Luís Silva</span>
-                                <span class="item-role">Administrador Executivo</span>
-                            </li>
-                            <li class="custom-option" role="option" aria-selected="false" data-value="3">
-                                <span class="item-name">Roberto Lopes</span>
-                                <span class="item-role">Gestor de Propostas Comerciais</span>
-                            </li>
-                            <li class="custom-option" role="option" aria-selected="false" data-value="4">
-                                <span class="item-name">Paulo Costa</span>
-                                <span class="item-role">Consultor Externo de Arquitetura &amp; ERP</span>
-                            </li>
-                        </ul>
+                        <!-- Área do Dropdown (agora inclui a pesquisa) -->
+                        <div class="custom-select-dropdown">
+                            <!-- Nova funcionalidade: Caixa de Pesquisa -->
+                            <div class="custom-select-search-box">
+                                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input type="text" class="custom-select-search-input" placeholder="Pesquisar nome ou cargo..." autocomplete="off">
+                            </div>
+
+                            <!-- Lista de opções -->
+                            <ul class="custom-select-options" role="listbox" tabindex="-1">
+                                <li class="custom-option is-selected" role="option" aria-selected="true" data-value="1">
+                                    <span class="item-name">Ricardo Lopes</span>
+                                    <span class="item-role">Engenharia IT &amp; Web Development</span>
+                                </li>
+                                <li class="custom-option" role="option" aria-selected="false" data-value="2">
+                                    <span class="item-name">Luís Silva</span>
+                                    <span class="item-role">Administrador Executivo</span>
+                                </li>
+                                <li class="custom-option" role="option" aria-selected="false" data-value="3">
+                                    <span class="item-name">Roberto Lopes</span>
+                                    <span class="item-role">Gestor de Propostas Comerciais</span>
+                                </li>
+                                <li class="custom-option" role="option" aria-selected="false" data-value="4">
+                                    <span class="item-name">Paulo Costa</span>
+                                    <span class="item-role">Consultor Externo de Arquitetura &amp; ERP</span>
+                                </li>
+                                <!-- Mensagem de estado vazio (escondida por defeito) -->
+                                <li class="custom-option-empty" style="display: none;">
+                                    Nenhum colaborador encontrado.
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <!-- Demonstração do valor guardado para o backend -->
+                    <!-- Demonstração do valor guardado -->
                     <div class="status-bar">
                         Valor no <code>&lt;input type="hidden"&gt;</code>: <strong id="debug-valor">1</strong>
                     </div>
