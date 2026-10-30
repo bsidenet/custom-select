@@ -1,12 +1,24 @@
 /**
- * @description Controlador JavaScript do Custom Select com Filtro de Pesquisa e suporte teclado
- * @version 1.1.0
+ * @description Controlador JavaScript do Custom Select (Pesquisa Dinâmica + Debounce + Highlight)
+ * @version 1.2.0
  * @author Bsidenet.com
- * @date 2026-10-29
+ * @date 2026-10-30
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     const customSelects = document.querySelectorAll('.custom-select');
+
+    // Utilitário para escapar caracteres especiais em expressões regulares
+    const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // Utilitário Debounce para não saturar a pesquisa (ideal para futuras chamadas API)
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
 
     customSelects.forEach((selectContainer) => {
         const trigger = selectContainer.querySelector('.custom-select-trigger');
@@ -21,9 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let focusedIndex = options.findIndex(opt => opt.classList.contains('is-selected'));
 
-        /**
-         * Alterna a abertura/fecho do menu dropdown
-         */
         const toggleDropdown = () => {
             const isOpen = selectContainer.classList.contains('is-open');
             closeAllSelects();
@@ -32,11 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectContainer.classList.add('is-open');
                 trigger.setAttribute('aria-expanded', 'true');
                 
-                // Reseta a pesquisa e foca o campo de pesquisa automaticamente
                 if (searchInput) {
                     searchInput.value = '';
-                    filterOptions('');
-                    // Foca a caixa de pesquisa ao abrir para ser imediato escrever
+                    filterOptions(''); // Reseta a vista
                     setTimeout(() => searchInput.focus(), 50);
                 } else {
                     optionsList.focus();
@@ -45,51 +52,80 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         /**
-         * Lógica de Filtro de Pesquisa (Nova Funcionalidade)
+         * Aplica a marcação HTML (<mark>) aos termos encontrados
+         */
+        const highlightText = (element, originalText, term) => {
+            if (!term) {
+                element.textContent = originalText;
+                return;
+            }
+            const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+            element.innerHTML = originalText.replace(regex, '<mark class="highlight">$1</mark>');
+        };
+
+        /**
+         * Lógica Central da Pesquisa Dinâmica
          */
         const filterOptions = (term) => {
             const normalizedTerm = term.toLowerCase().trim();
             let hasVisibleOptions = false;
 
             options.forEach(option => {
-                const name = option.querySelector('.item-name').textContent.toLowerCase();
-                const role = option.querySelector('.item-role').textContent.toLowerCase();
+                const nameEl = option.querySelector('.item-name');
+                const roleEl = option.querySelector('.item-role');
                 
-                // Pesquisa no nome OU no cargo
-                if (name.includes(normalizedTerm) || role.includes(normalizedTerm)) {
+                // Armazena o texto original em cache na primeira passagem
+                if (!nameEl.hasAttribute('data-original')) {
+                    nameEl.setAttribute('data-original', nameEl.textContent.trim());
+                }
+                if (!roleEl.hasAttribute('data-original')) {
+                    roleEl.setAttribute('data-original', roleEl.textContent.trim());
+                }
+
+                const nameText = nameEl.getAttribute('data-original');
+                const roleText = roleEl.getAttribute('data-original');
+                
+                const matchesName = nameText.toLowerCase().includes(normalizedTerm);
+                const matchesRole = roleText.toLowerCase().includes(normalizedTerm);
+
+                if (matchesName || matchesRole) {
                     option.style.display = 'flex';
                     hasVisibleOptions = true;
+                    // Aplica o highlight visual ao que bateu certo
+                    highlightText(nameEl, nameText, normalizedTerm);
+                    highlightText(roleEl, roleText, normalizedTerm);
                 } else {
                     option.style.display = 'none';
                     option.classList.remove('is-focused');
+                    // Limpa highlights invisíveis
+                    highlightText(nameEl, nameText, "");
+                    highlightText(roleEl, roleText, "");
                 }
             });
 
-            // Mostra a mensagem de erro se não houver resultados
             if (emptyState) {
                 emptyState.style.display = hasVisibleOptions ? 'none' : 'block';
             }
         };
 
-        // Evento de digitação na caixa de pesquisa
+        // Aplica o evento com Debounce (250ms de espera após o utilizador parar de escrever)
         if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
+            const debouncedSearch = debounce((e) => {
                 filterOptions(e.target.value);
-                // Reseta o foco do teclado para a primeira opção visível após pesquisar
-                focusedIndex = -1; 
-            });
+                focusedIndex = -1; // Reseta o foco do teclado
+            }, 250);
 
-            // Impede que clicar no campo de pesquisa feche o dropdown
+            searchInput.addEventListener('input', debouncedSearch);
             searchInput.addEventListener('click', (e) => e.stopPropagation());
         }
 
-        /**
-         * Seleciona uma opção e atualiza o estado
-         */
         const selectOption = (optionElement) => {
             const value = optionElement.getAttribute('data-value');
-            const nameText = optionElement.querySelector('.item-name').textContent;
-            const roleText = optionElement.querySelector('.item-role').textContent;
+            // Vai buscar sempre ao data-original para evitar puxar a tag <mark> para o título
+            const nameEl = optionElement.querySelector('.item-name');
+            const roleEl = optionElement.querySelector('.item-role');
+            const nameText = nameEl.getAttribute('data-original') || nameEl.textContent;
+            const roleText = roleEl.getAttribute('data-original') || roleEl.textContent;
 
             triggerName.textContent = nameText;
             triggerRole.textContent = roleText;
@@ -111,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
             optionElement.classList.add('is-selected');
             optionElement.setAttribute('aria-selected', 'true');
             
-            // Atualiza o índice focado considerando apenas os visíveis
             focusedIndex = getVisibleOptions().indexOf(optionElement);
 
             selectContainer.classList.remove('is-open');
@@ -131,12 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        /**
-         * Utilitário para obter apenas as opções que não foram filtradas pela pesquisa
-         */
         const getVisibleOptions = () => options.filter(opt => opt.style.display !== 'none');
 
-        // Navegação por teclado inteligente (considera pesquisa)
         selectContainer.addEventListener('keydown', (event) => {
             const isOpen = selectContainer.classList.contains('is-open');
             const visibleOptions = getVisibleOptions();
@@ -153,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!isOpen) {
                     toggleDropdown();
                 } else if (visibleOptions.length > 0) {
-                    // Impede o foco de descer para a caixa de input, navega apenas nas <li>
                     const currentVisibleIndex = visibleOptions.findIndex(opt => opt.classList.contains('is-focused'));
                     const nextIndex = (currentVisibleIndex + 1) % visibleOptions.length;
                     updateFocusedOption(visibleOptions, nextIndex);
@@ -169,12 +199,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (event.key === 'Enter') {
                 if (isOpen) {
-                    event.preventDefault(); // Impede submissão de formulários ao pesquisar
+                    event.preventDefault();
                     const currentFocused = visibleOptions.find(opt => opt.classList.contains('is-focused'));
                     if (currentFocused) {
                         selectOption(currentFocused);
                     } else if (visibleOptions.length === 1) {
-                        // Se houver apenas 1 resultado após pesquisar, o Enter seleciona-o logo
                         selectOption(visibleOptions[0]);
                     }
                 }
@@ -183,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateFocusedOption(visibleOptions, index) {
-        // Limpa o focus de TODAS as opções primeiro
         document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('is-focused'));
         const target = visibleOptions[index];
         if (target) {
