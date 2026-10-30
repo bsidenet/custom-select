@@ -1,8 +1,8 @@
 /**
- * @description Estilos CSS para Select Nativo e Custom Select (com suporte a Pesquisa)
- * @version 1.1.0
+ * @description Estilos CSS para Select Nativo e Custom Select com Pesquisa Dinâmica
+ * @version 1.2.0
  * @author Bsidenet.com
- * @date 2026-10-29
+ * @date 2026-10-30
  */
 
 /* ==========================================================================
@@ -18,6 +18,11 @@
     --border-color: #e2e8f0;
     --border-focus: #3b82f6;
     --accent-color: #2563eb;
+    
+    /* Novas cores para o highlight da pesquisa */
+    --highlight-bg: #fef08a;
+    --highlight-text: #854d0e;
+
     --radius-md: 8px;
     --radius-lg: 12px;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
@@ -27,13 +32,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-    font-family: var(--font-sans);
-    background-color: var(--bg-page);
-    color: var(--text-primary);
-    line-height: 1.5;
-    padding: 40px 20px;
-}
+body { font-family: var(--font-sans); background-color: var(--bg-page); color: var(--text-primary); line-height: 1.5; padding: 40px 20px; }
 
 /* ==========================================================================
    2. LAYOUT DE DEMONSTRAÇÃO
@@ -63,7 +62,6 @@ body {
 .native-rich-select option:hover { background-color: var(--bg-hover); }
 .native-rich-select option:checked { background-color: var(--bg-selected); }
 .native-rich-select selectedcontent { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
-
 .opt-name { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
 .opt-role { font-size: 0.75rem; font-weight: 400; color: var(--text-secondary); margin-top: 2px; }
 
@@ -71,8 +69,6 @@ body {
    4. ABORDAGEM 2: CUSTOM SELECT UNIVERSAL (HTML + CSS + JS)
    ========================================================================== */
 .custom-select { position: relative; width: 100%; user-select: none; }
-
-/* Botão Trigger */
 .custom-select-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; text-align: left; font-family: inherit; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
 .custom-select-trigger:hover { border-color: #cbd5e1; }
 .custom-select.is-open .custom-select-trigger, .custom-select-trigger:focus-visible { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
@@ -80,20 +76,16 @@ body {
 .select-arrow { color: var(--text-secondary); transition: transform 0.2s ease; flex-shrink: 0; }
 .custom-select.is-open .select-arrow { transform: rotate(180deg); color: var(--accent-color); }
 
-/* Contentor do Dropdown (inclui pesquisa e lista) */
 .custom-select-dropdown {
     position: absolute; top: calc(100% + 6px); left: 0; right: 0;
     background-color: var(--bg-card); border: 1px solid var(--border-color);
     border-radius: var(--radius-md); box-shadow: var(--shadow-dropdown);
     z-index: 100; display: flex; flex-direction: column;
-    
     opacity: 0; visibility: hidden; transform: translateY(-6px);
     transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
 }
-
 .custom-select.is-open .custom-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
 
-/* Nova área: Caixa de Pesquisa Fixa no topo */
 .custom-select-search-box {
     padding: 10px; border-bottom: 1px solid var(--border-color);
     display: flex; align-items: center; gap: 8px; position: sticky; top: 0;
@@ -106,28 +98,26 @@ body {
 }
 .custom-select-search-input::placeholder { color: #94a3b8; }
 
-/* Lista de Opções (com Scroll) */
-.custom-select-options {
-    padding: 6px; list-style: none; max-height: 220px; overflow-y: auto;
-}
-
+.custom-select-options { padding: 6px; list-style: none; max-height: 220px; overflow-y: auto; }
 .custom-option {
     display: flex; flex-direction: column; padding: 10px 12px;
     border-radius: 6px; cursor: pointer; transition: background-color 0.15s ease;
 }
 .custom-option:hover, .custom-option.is-focused { background-color: var(--bg-hover); }
 .custom-option.is-selected { background-color: var(--bg-selected); }
+.custom-option-empty { padding: 16px 12px; text-align: center; font-size: 0.85rem; color: var(--text-secondary); cursor: default; }
 
-/* Opção vazia ("Nenhum resultado") */
-.custom-option-empty {
-    padding: 16px 12px; text-align: center; font-size: 0.85rem;
-    color: var(--text-secondary); cursor: default;
-}
-
-/* Textos */
 .item-name { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); line-height: 1.25; }
 .custom-option.is-selected .item-name { color: var(--accent-color); }
 .item-role { font-size: 0.75rem; font-weight: 400; color: var(--text-secondary); }
 
-/* Barra informativa */
+/* Estilo para a marcação dinâmica (Highlight) */
+mark.highlight {
+    background-color: var(--highlight-bg);
+    color: var(--highlight-text);
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: inherit;
+}
+
 .status-bar { margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary); padding: 8px 12px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: 6px; }
