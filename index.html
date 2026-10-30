@@ -1,15 +1,15 @@
 <!--
- * @description Estrutura HTML com Select Nativo e Custom Select (agora com Pesquisa)
- * @version 1.1.0
+ * @description Estrutura HTML com Select Nativo e Custom Select com Pesquisa Dinâmica
+ * @version 1.2.0
  * @author Bsidenet.com
- * @date 2026-10-29
+ * @date 2026-10-30
 -->
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Personalizado - Nome e Cargo</title>
+    <title>Select Personalizado - Nome e Cargo (Pesquisa Avançada)</title>
     <!-- Ligação para a folha de estilos externa -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -18,7 +18,7 @@
     <main class="container">
         <header class="page-header">
             <h1>Personalização de Select (Nome + Cargo)</h1>
-            <p>Duas formas de aplicar tipografias diferentes, agora com pesquisa em tempo real no Custom Select.</p>
+            <p>Evolução 1.2.0: Pesquisa dinâmica com Highlight visual e otimização Debounce.</p>
         </header>
 
         <div class="grid-demo">
@@ -29,7 +29,7 @@
             <section class="card">
                 <span class="badge">Abordagem 1 • CSS Nativo Moderno</span>
                 <h2>Select HTML Nativo Customizável</h2>
-                <p class="card-desc">Usa a propriedade <code>appearance: base-select</code>. Limpo, mas sem barra de pesquisa nativa (ainda).</p>
+                <p class="card-desc">Usa a propriedade <code>appearance: base-select</code>. Limpo, mas sem controlo avançado de pesquisa.</p>
 
                 <div class="form-group">
                     <label for="colaborador-nativo" class="form-label">Selecionar Responsável</label>
@@ -64,12 +64,12 @@
             </section>
 
             <!-- =================================================================
-                 ABORDAGEM 2: CUSTOM SELECT COM PESQUISA (HTML + CSS + JS)
+                 ABORDAGEM 2: CUSTOM SELECT COM PESQUISA DINÂMICA (HTML + CSS + JS)
                  ================================================================= -->
             <section class="card">
                 <span class="badge badge-universal">Abordagem 2 • Universal (Cross-Browser)</span>
-                <h2>Custom Dropdown com Pesquisa</h2>
-                <p class="card-desc">Garante o mesmo aspeto em todos os browsers e adiciona uma caixa de filtro rápido no topo do menu.</p>
+                <h2>Custom Dropdown com Pesquisa Dinâmica</h2>
+                <p class="card-desc">Inclui debounce para performance e highlight inteligente das palavras pesquisadas.</p>
 
                 <form id="form-exemplo" class="form-group">
                     <label id="custom-select-label" class="form-label">Selecionar Responsável</label>
@@ -77,7 +77,7 @@
                     <!-- Contentor principal do Custom Select -->
                     <div class="custom-select" id="select-colaborador" data-name="colaborador_id">
                         
-                        <!-- Input oculto para o backend (PHP) -->
+                        <!-- Input oculto para submissão POST/GET -->
                         <input type="hidden" name="colaborador_id" id="colaborador_id_input" value="1">
 
                         <!-- Botão principal -->
@@ -91,9 +91,9 @@
                             </svg>
                         </button>
 
-                        <!-- Área do Dropdown (agora inclui a pesquisa) -->
+                        <!-- Área do Dropdown -->
                         <div class="custom-select-dropdown">
-                            <!-- Nova funcionalidade: Caixa de Pesquisa -->
+                            <!-- Caixa de Pesquisa -->
                             <div class="custom-select-search-box">
                                 <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="11" cy="11" r="8"></circle>
